@@ -1,0 +1,127 @@
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { concepts } from '../data/concepts';
+import { useProgress } from '../hooks/useProgress';
+
+const Journey = () => {
+  const { isVisited, isFavorite, visitedCount } = useProgress();
+  const sorted = [...concepts].sort((a, b) => a.chapterNumber - b.chapterNumber);
+
+  // Find the next unvisited
+  const nextIndex = sorted.findIndex((c) => !isVisited(c.id));
+
+  return (
+    <div className="min-h-screen px-4 pt-8 pb-4 max-w-lg mx-auto">
+      <motion.div
+        className="mb-6"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1 className="text-2xl font-black text-white mb-1">מסע מודרך</h1>
+        <p className="text-blue-300/60 text-sm">עקוב אחרי ספר הוקינג פרק אחר פרק</p>
+
+        <div className="flex items-center gap-3 mt-3">
+          <div className="flex-1 h-1.5 rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-blue-400 transition-all duration-500"
+              style={{ width: `${(visitedCount / sorted.length) * 100}%` }}
+            />
+          </div>
+          <span className="text-xs text-blue-300/60">{visitedCount}/{sorted.length}</span>
+        </div>
+      </motion.div>
+
+      <div className="relative">
+        {/* Vertical line */}
+        <div className="absolute right-6 top-0 bottom-0 w-0.5 bg-blue-900/60" />
+
+        <div className="space-y-3">
+          {sorted.map((concept, i) => {
+            const visited = isVisited(concept.id);
+            const fav = isFavorite(concept.id);
+            const isNext = i === nextIndex;
+
+            return (
+              <motion.div
+                key={concept.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <Link to={`/concept/${concept.slug}`}>
+                  <div className={`relative mr-14 rounded-2xl p-4 border transition-all duration-200 hover:scale-[1.02] ${
+                    isNext ? 'ring-1 ring-offset-1 ring-offset-transparent' : ''
+                  }`}
+                    style={{
+                      background: visited
+                        ? `linear-gradient(135deg, ${concept.color}18, #1a2040)`
+                        : 'linear-gradient(135deg, #141830, #1a2040)',
+                      borderColor: visited ? concept.color + '60' : isNext ? concept.color + '80' : '#2a3560',
+                      boxShadow: isNext ? `0 0 0 1px ${concept.color}60` : undefined,
+                    }}
+                  >
+                    {/* chapter marker */}
+                    <div
+                      className="absolute -right-8 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold"
+                      style={{
+                        background: visited ? concept.color : '#0a0e1a',
+                        borderColor: concept.color,
+                        color: visited ? '#0a0e1a' : concept.color,
+                        zIndex: 10,
+                      }}
+                    >
+                      {visited ? '✓' : concept.chapterNumber}
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl flex-shrink-0">{concept.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-blue-300/40">{concept.chapterLabel}</span>
+                          {fav && <span className="text-yellow-400 text-xs">★</span>}
+                          {isNext && !visited && (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400">הבא</span>
+                          )}
+                        </div>
+                        <h3 className="font-bold text-sm mt-0.5" style={{ color: concept.color }}>
+                          {concept.titleHe}
+                        </h3>
+                        <p className="text-xs text-blue-300/50 mt-1 line-clamp-1">
+                          {concept.layer1He}
+                        </p>
+                        {concept.isAbstract && (
+                          <span className="text-xs text-orange-400/60 mt-0.5 block">⚡ מושג מתקדם</span>
+                        )}
+                      </div>
+                      {visited && (
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
+                          style={{ background: concept.color }}>
+                          <span className="text-xs text-black font-bold">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {visitedCount === sorted.length && (
+        <motion.div
+          className="mt-6 p-5 rounded-2xl text-center border border-yellow-500/30"
+          style={{ background: 'linear-gradient(135deg, #1a1500, #1a2040)' }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="text-4xl mb-2">🎉</div>
+          <div className="text-yellow-400 font-bold text-lg">השלמת את המסע!</div>
+          <div className="text-blue-300/60 text-xs mt-1">חקרת את כל 13 עולמות הוקינג</div>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default Journey;
