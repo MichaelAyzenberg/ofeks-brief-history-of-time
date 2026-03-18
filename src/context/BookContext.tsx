@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { concepts as hawkingConcepts, type Concept } from '../data/concepts';
 import { principiaConcepts } from '../data/principia';
 
@@ -32,6 +32,12 @@ export const BookProvider = ({ children }: { children: ReactNode }) => {
 
   const isNewton = bookId === 'newton';
   const isHawking = bookId === 'hawking';
+
+  // Sync document direction and language with active book
+  useEffect(() => {
+    document.documentElement.dir = isNewton ? 'ltr' : 'rtl';
+    document.documentElement.lang = isNewton ? 'en' : 'he';
+  }, [isNewton]);
   const currentConcepts = isNewton ? principiaConcepts : hawkingConcepts;
   const progressKey = isNewton ? 'newton-progress' : 'ofek-progress';
 

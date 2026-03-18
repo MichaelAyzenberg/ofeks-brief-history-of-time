@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBook } from '../context/BookContext';
 import { useProgress } from '../hooks/useProgress';
+import { useTheme } from '../context/ThemeContext';
 
 const Progress = () => {
+  const { C } = useTheme();
   const { concepts, progressKey, isNewton } = useBook();
   const { isVisited, isFavorite, visitedCount, favoriteCount, resetProgress } = useProgress(progressKey);
   const total = concepts.length;
@@ -64,7 +66,7 @@ const Progress = () => {
       {/* Big progress ring */}
       <motion.div
         className="flex items-center gap-6 p-5 rounded-2xl border border-blue-800/40 mb-5"
-        style={{ background: 'linear-gradient(135deg, #1a2040, #141830)' }}
+        style={{ background: C.cardGrad }}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.1 }}
@@ -117,7 +119,7 @@ const Progress = () => {
               key={i}
               className="rounded-xl p-3 text-center border transition-all"
               style={{
-                background: badge.earned ? 'linear-gradient(135deg, #1e3a5f, #1a2040)' : '#0d1120',
+                background: badge.earned ? C.card : C.card2,
                 borderColor: badge.earned ? accentColor + '40' : '#1a2040',
                 opacity: badge.earned ? 1 : 0.4,
               }}

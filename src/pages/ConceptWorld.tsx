@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBook } from '../context/BookContext';
 import { getScientistsByIds } from '../data/scientists';
 import { useProgress } from '../hooks/useProgress';
+import { useTheme } from '../context/ThemeContext';
 import ConceptCard from '../components/ConceptCard';
 import ScientistCard from '../components/ScientistCard';
 
@@ -80,6 +81,7 @@ type TabId = 'explanation' | 'interactive' | 'deeper' | 'parent';
 
 const ConceptWorld = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { C, isDark } = useTheme();
   const { getConceptBySlug, getRelatedConcepts, progressKey, isNewton } = useBook();
   const concept = getConceptBySlug(slug || '');
   const { markVisited, toggleFavorite, isVisited, isFavorite } = useProgress(progressKey);
@@ -213,7 +215,7 @@ const ConceptWorld = () => {
       {/* Tabs */}
       <div
         className="sticky top-0 z-20 px-4 py-2"
-        style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #2a356030' }}
+        style={{ background: C.nav, backdropFilter: 'blur(10px)', borderBottom: `1px solid ${C.border}30` }}
       >
         <div className="flex gap-1">
           {tabs.map((tab) => (
@@ -268,7 +270,7 @@ const ConceptWorld = () => {
               {/* Key facts */}
               {concept.keyFacts && concept.keyFacts.length > 0 && (
                 <div className="rounded-2xl p-4 mb-4 border border-white/10"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}>
+                  style={{ background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(59,130,246,0.05)' }}>
                   <div className="text-xs font-bold mb-3" style={{ color: concept.color }}>{L.keyFacts}</div>
                   <div className="space-y-2">
                     {concept.keyFacts.map((fact, i) => (
@@ -309,7 +311,7 @@ const ConceptWorld = () => {
               {/* Author quote */}
               {concept.hawkingQuote && (
                 <div className="rounded-2xl p-4 mb-4 border border-white/10"
-                  style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(59,130,246,0.04)' }}>
                   <div className="text-xs font-bold text-blue-300/50 mb-2">{L.quoteBy}</div>
                   <p className="text-xs text-blue-300/70 leading-relaxed italic">{concept.hawkingQuote}</p>
                   <div className="text-xs text-blue-400/40 mt-1">{L.quoteAttrib}</div>
@@ -339,7 +341,7 @@ const ConceptWorld = () => {
 
               {/* Chapter link */}
               <div className="rounded-2xl p-3 border border-white/10 mb-4"
-                style={{ background: 'rgba(255,255,255,0.02)' }}>
+                style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(59,130,246,0.04)' }}>
                 <div className="text-xs text-blue-300/40 leading-relaxed">
                   {L.chapterRef}
                 </div>
@@ -365,7 +367,7 @@ const ConceptWorld = () => {
               transition={{ duration: 0.25 }}
             >
               <div className="rounded-2xl border overflow-hidden mb-4"
-                style={{ borderColor: concept.color + '40', background: '#141830' }}>
+                style={{ borderColor: concept.color + '40', background: C.card2 }}>
                 <div className="p-3 border-b flex items-center gap-2"
                   style={{ borderColor: concept.color + '20', background: concept.color + '10' }}>
                   <div className="w-4 h-4 rounded-full flex items-center justify-center"
@@ -431,7 +433,7 @@ const ConceptWorld = () => {
               {/* History */}
               {concept.historyHe && (
                 <div className="rounded-2xl p-4 mb-4 border border-white/10"
-                  style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(59,130,246,0.04)' }}>
                   <div className="text-xs font-bold text-blue-300/60 mb-2">{L.history}</div>
                   <p className="text-xs text-blue-300/60 leading-relaxed">{concept.historyHe}</p>
                 </div>
@@ -440,7 +442,7 @@ const ConceptWorld = () => {
               {/* Scientists */}
               {concept.scientistsHe && (
                 <div className="rounded-2xl p-4 mb-4 border border-white/10"
-                  style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(59,130,246,0.04)' }}>
                   <div className="text-xs font-bold text-blue-300/60 mb-2">{L.scientists}</div>
                   <p className="text-xs text-blue-300/60 leading-relaxed">{concept.scientistsHe}</p>
                 </div>
@@ -473,8 +475,8 @@ const ConceptWorld = () => {
                 style={{
                   borderColor: isNewton ? '#f59e0b30' : '#a855f730',
                   background: isNewton
-                    ? 'linear-gradient(135deg, #3d220010, #1a2040)'
-                    : 'linear-gradient(135deg, #2d1b4e30, #1a2040)',
+                    ? isDark ? 'linear-gradient(135deg, #3d220010, #1a2040)' : 'linear-gradient(135deg, #fef3c720, #f0f4ff)'
+                    : isDark ? 'linear-gradient(135deg, #2d1b4e30, #1a2040)' : 'linear-gradient(135deg, #ede9fe30, #f0f4ff)',
                 }}
               >
                 <div className="flex items-center gap-2 mb-3">
@@ -511,8 +513,8 @@ const ConceptWorld = () => {
                 className="rounded-2xl p-4 border"
                 style={
                   isNewton
-                    ? { background: 'rgba(245,158,11,0.06)', borderColor: '#f59e0b30' }
-                    : { background: 'rgba(139,92,246,0.08)', borderColor: '#7c3aed30' }
+                    ? { background: isDark ? 'rgba(245,158,11,0.06)' : 'rgba(245,158,11,0.08)', borderColor: '#f59e0b30' }
+                    : { background: isDark ? 'rgba(139,92,246,0.08)' : 'rgba(139,92,246,0.05)', borderColor: '#7c3aed30' }
                 }
               >
                 <h3

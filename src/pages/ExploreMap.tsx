@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useBook } from '../context/BookContext';
+import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../hooks/useProgress';
 import ConceptCard from '../components/ConceptCard';
 
@@ -21,22 +22,20 @@ const newtonCategories = [
 
 const ExploreMap = () => {
   const { concepts, progressKey, isNewton } = useBook();
+  const { isDark, C } = useTheme();
   const { isVisited, isFavorite } = useProgress(progressKey);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
 
   const categories = isNewton ? newtonCategories : hawkingCategories;
+  const accentColor = isNewton ? '#f59e0b' : '#3b82f6';
 
   const activeCategory = categories.find((c) => c.id === filter);
   const filtered = concepts.filter((c) => {
     let matchCategory = false;
-    if (filter === 'all') {
-      matchCategory = true;
-    } else if (filter === 'advanced') {
-      matchCategory = c.isAbstract;
-    } else if (activeCategory?.ids) {
-      matchCategory = activeCategory.ids.includes(c.id);
-    }
+    if (filter === 'all') matchCategory = true;
+    else if (filter === 'advanced') matchCategory = c.isAbstract;
+    else if (activeCategory?.ids) matchCategory = activeCategory.ids.includes(c.id);
 
     const matchSearch =
       !search ||
@@ -54,26 +53,25 @@ const ExploreMap = () => {
     ? `${concepts.length} concepts — choose where to go`
     : `${concepts.length} עולמות לגלות – בחר לאן ללכת`;
   const searchPlaceholder = isNewton ? 'Search concept...' : 'חפש מושג...';
-  const noResultsLabel = isNewton ? 'No results' : 'לא נמצאו תוצאות';
 
   return (
     <div className="min-h-screen px-4 pt-8 pb-4 max-w-lg mx-auto">
-      <motion.div
-        className="mb-5"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <motion.div className="mb-5" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-black text-white mb-1">{title}</h1>
         <p className="text-blue-300/60 text-sm">{subtitle}</p>
 
-        {/* Search */}
         <div className="relative mt-3">
           <input
             type="text"
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl text-sm bg-white/5 border border-white/10 text-white placeholder-blue-300/30 outline-none focus:border-blue-500/50 transition-all"
+            className="w-full px-4 py-2.5 rounded-xl text-sm border text-white outline-none transition-all"
+            style={{
+              background: C.inputBg,
+              borderColor: C.border + '60',
+              color: isDark ? '#c8d4f0' : '#1e2a4a',
+            }}
             dir={isNewton ? 'ltr' : 'rtl'}
           />
           {search && (
@@ -95,9 +93,9 @@ const ExploreMap = () => {
             onClick={() => setFilter(cat.id)}
             className="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border"
             style={{
-              background: filter === cat.id ? (isNewton ? '#f59e0b' : '#3b82f6') : 'transparent',
-              borderColor: filter === cat.id ? (isNewton ? '#f59e0b' : '#3b82f6') : '#2a356060',
-              color: filter === cat.id ? 'white' : '#7a8ab0',
+              background: filter === cat.id ? accentColor : 'transparent',
+              borderColor: filter === cat.id ? accentColor : C.border + '60',
+              color: filter === cat.id ? 'white' : isDark ? '#7a8ab0' : '#4b5563',
             }}
           >
             {cat.label}
@@ -105,14 +103,12 @@ const ExploreMap = () => {
         ))}
       </div>
 
-      {/* Stats */}
       {!search && (
         <div className="text-xs text-blue-300/40 mb-3">
           {visited}/{filtered.length} {isNewton ? 'explored in this category' : 'נחקרו בקטגוריה זו'}
         </div>
       )}
 
-      {/* Grid */}
       {filtered.length > 0 ? (
         <motion.div
           className="grid grid-cols-1 gap-3"
@@ -138,7 +134,7 @@ const ExploreMap = () => {
       ) : (
         <div className="text-center py-12 text-blue-300/30">
           <div className="text-4xl mb-2">🔭</div>
-          <div className="text-sm">{noResultsLabel}</div>
+          <div className="text-sm">{isNewton ? 'No results' : 'לא נמצאו תוצאות'}</div>
         </div>
       )}
     </div>

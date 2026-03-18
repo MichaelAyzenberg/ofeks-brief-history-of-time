@@ -1,8 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useBook } from '../context/BookContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navigation = () => {
   const { isNewton } = useBook();
+  const { isDark, toggleTheme, C } = useTheme();
   const navigate = useNavigate();
 
   const hawkingItems = [
@@ -21,15 +23,13 @@ const Navigation = () => {
   ];
 
   const navItems = isNewton ? newtonItems : hawkingItems;
-
-  const handleSwitchBook = () => {
-    navigate('/');
-  };
+  const activeColor = isDark ? '#60a5fa' : '#2563eb';
+  const inactiveColor = isDark ? 'rgba(191,219,254,0.5)' : 'rgba(30,42,74,0.5)';
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-blue-900/40"
-      style={{ background: 'rgba(10,14,26,0.95)', backdropFilter: 'blur(12px)' }}
+      className="fixed bottom-0 left-0 right-0 z-50"
+      style={{ background: C.nav, backdropFilter: 'blur(12px)', borderTop: C.navBorder, transition: 'background 0.3s ease' }}
     >
       <div className="max-w-2xl mx-auto flex items-center justify-around px-1 py-1.5">
         {navItems.map((item) => (
@@ -37,23 +37,33 @@ const Navigation = () => {
             key={item.to}
             to={item.to}
             end={item.exact}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[46px] ${
-                isActive
-                  ? 'text-blue-400 bg-blue-900/30'
-                  : 'text-blue-200/50 hover:text-blue-300 hover:bg-white/5'
-              }`
-            }
+            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[46px]"
+            style={({ isActive }) => ({
+              color: isActive ? activeColor : inactiveColor,
+              background: isActive ? (isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.1)') : 'transparent',
+            })}
           >
             <span className="text-lg leading-none">{item.icon}</span>
             <span className="text-[10px] font-medium leading-none">{item.label}</span>
           </NavLink>
         ))}
 
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[46px]"
+          style={{ color: inactiveColor }}
+          title={isDark ? 'Day mode' : 'Night mode'}
+        >
+          <span className="text-lg leading-none">{isDark ? '☀️' : '🌙'}</span>
+          <span className="text-[10px] font-medium leading-none">{isDark ? (isNewton ? 'Day' : 'יום') : (isNewton ? 'Night' : 'לילה')}</span>
+        </button>
+
         {/* Book switcher */}
         <button
-          onClick={handleSwitchBook}
-          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[46px] text-blue-200/50 hover:text-blue-300 hover:bg-white/5"
+          onClick={() => navigate('/')}
+          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-all duration-200 min-w-[46px]"
+          style={{ color: inactiveColor }}
           title="Switch book"
         >
           <span className="text-lg leading-none">📚</span>

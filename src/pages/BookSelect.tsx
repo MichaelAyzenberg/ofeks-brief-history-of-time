@@ -1,40 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useBook, type BookId } from '../context/BookContext';
+import { useTheme } from '../context/ThemeContext';
 import StarField from '../components/StarField';
 
 const books = [
   {
     id: 'hawking' as BookId,
     title: 'היסטוריה קצרה של הזמן',
-    titleEn: "A Brief History of Time",
     author: 'סטיבן הוקינג',
-    authorEn: 'Stephen Hawking',
     subtitle: 'עם אופק',
-    subtitleEn: 'For Ofek',
     emoji: '🌌',
     description: 'מסע מודרך דרך 13 עולמות של פיזיקה מודרנית — עבור ילדים סקרנים',
-    descriptionEn: 'A guided journey through 13 worlds of modern physics — for curious kids',
     color: '#60a5fa',
-    gradient: 'linear-gradient(135deg, #1e3a5f, #141830)',
-    border: '#60a5fa40',
     tag: '🇮🇱 עברית · ילדים',
     concepts: 13,
   },
   {
     id: 'newton' as BookId,
     title: "Newton's Principia",
-    titleEn: 'Philosophiæ Naturalis Principia Mathematica',
-    author: 'Isaac Newton',
-    authorEn: '1687',
+    author: 'Isaac Newton · 1687',
     subtitle: 'For Michael',
-    subtitleEn: 'MSc Systems Engineering · BSc Mechanical Engineering',
     emoji: '⚖️',
-    description: 'Ten key concepts from all three Books of the Principia — for engineers who want the original.',
-    descriptionEn: 'Laws of motion, orbital mechanics, fluid resistance, gravity — from Newton\'s own mathematical framework.',
+    description: "Ten key concepts from all three Books — Laws of Motion, Orbital Mechanics, Fluid Resistance, Gravity — at engineer level.",
     color: '#f59e0b',
-    gradient: 'linear-gradient(135deg, #3d2200, #1a1200)',
-    border: '#f59e0b40',
     tag: '🇬🇧 English · Adult',
     concepts: 10,
   },
@@ -42,6 +31,7 @@ const books = [
 
 const BookSelect = () => {
   const { setBook, bookId } = useBook();
+  const { isDark, toggleTheme, C } = useTheme();
   const navigate = useNavigate();
 
   const handleSelect = (id: BookId) => {
@@ -50,8 +40,8 @@ const BookSelect = () => {
   };
 
   return (
-    <div className="min-h-screen relative" style={{ background: '#0a0e1a' }}>
-      <StarField />
+    <div className="min-h-screen relative" style={{ background: C.bg, transition: 'background 0.3s ease' }}>
+      {isDark && <StarField />}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-12">
 
         {/* Header */}
@@ -72,10 +62,10 @@ const BookSelect = () => {
             <motion.button
               key={book.id}
               onClick={() => handleSelect(book.id)}
-              className="w-full text-left rounded-2xl p-5 border transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full text-left rounded-2xl p-5 border transition-all duration-200"
               style={{
-                background: book.gradient,
-                borderColor: bookId === book.id ? book.color : book.border,
+                background: C.cardGrad,
+                borderColor: bookId === book.id ? book.color : C.border,
                 boxShadow: bookId === book.id ? `0 0 20px ${book.color}30` : undefined,
               }}
               initial={{ opacity: 0, y: 20 }}
@@ -90,21 +80,16 @@ const BookSelect = () => {
                   style={{
                     background: `${book.color}15`,
                     border: `1px solid ${book.color}40`,
-                    boxShadow: `0 0 15px ${book.color}20`,
                   }}
                 >
                   {book.emoji}
                 </div>
 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0" dir={book.id === 'newton' ? 'ltr' : 'rtl'}>
                   <div className="flex items-center gap-2 mb-0.5">
                     <span
                       className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{
-                        background: `${book.color}15`,
-                        color: book.color,
-                        border: `1px solid ${book.color}30`,
-                      }}
+                      style={{ background: `${book.color}15`, color: book.color, border: `1px solid ${book.color}30` }}
                     >
                       {book.tag}
                     </span>
@@ -113,25 +98,16 @@ const BookSelect = () => {
                     )}
                   </div>
 
-                  <h2
-                    className="text-lg font-black leading-tight mb-0.5"
-                    style={{ color: book.color }}
-                  >
+                  <h2 className="text-lg font-black leading-tight mb-0.5" style={{ color: book.color }}>
                     {book.title}
                   </h2>
-                  <p className="text-xs text-blue-300/50 mb-1">{book.author}</p>
+                  <p className="text-xs text-blue-300/50 mb-0.5">{book.author}</p>
                   <p className="text-xs text-blue-300/40 italic mb-2">{book.subtitle}</p>
-                  <p className="text-xs text-blue-200/60 leading-relaxed">
-                    {book.description}
-                  </p>
+                  <p className="text-xs text-blue-200/60 leading-relaxed">{book.description}</p>
 
                   <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-blue-300/30">
-                      {book.concepts} concepts
-                    </span>
-                    <span className="text-xs font-bold" style={{ color: book.color }}>
-                      Open →
-                    </span>
+                    <span className="text-xs text-blue-300/30">{book.concepts} concepts</span>
+                    <span className="text-xs font-bold" style={{ color: book.color }}>Open →</span>
                   </div>
                 </div>
               </div>
@@ -139,15 +115,29 @@ const BookSelect = () => {
           ))}
         </div>
 
-        {/* Footer note */}
-        <motion.p
-          className="mt-8 text-xs text-blue-300/25 text-center"
+        {/* Theme toggle + footer */}
+        <motion.div
+          className="mt-8 flex flex-col items-center gap-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          You can switch books anytime from the home screen
-        </motion.p>
+          <button
+            onClick={toggleTheme}
+            className="flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all"
+            style={{
+              background: C.card,
+              borderColor: C.border,
+              color: isDark ? '#93c5fd' : '#2563eb',
+            }}
+          >
+            <span>{isDark ? '☀️' : '🌙'}</span>
+            <span>{isDark ? 'Switch to Day Mode' : 'Switch to Night Mode'}</span>
+          </button>
+          <p className="text-xs text-blue-300/25 text-center">
+            You can also switch modes from the navigation bar
+          </p>
+        </motion.div>
       </div>
     </div>
   );
