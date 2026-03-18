@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
 
-const STORAGE_KEY = 'ofek-progress';
-
 interface ProgressData {
   visited: string[];
   favorites: string[];
@@ -15,9 +13,9 @@ const defaultProgress: ProgressData = {
   journeyProgress: 0,
 };
 
-const loadProgress = (): ProgressData => {
+const loadProgress = (storageKey: string): ProgressData => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return defaultProgress;
     return { ...defaultProgress, ...JSON.parse(raw) };
   } catch {
@@ -25,20 +23,25 @@ const loadProgress = (): ProgressData => {
   }
 };
 
-const saveProgress = (data: ProgressData) => {
+const saveProgress = (storageKey: string, data: ProgressData) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(storageKey, JSON.stringify(data));
   } catch {
     // ignore
   }
 };
 
-export const useProgress = () => {
-  const [progress, setProgress] = useState<ProgressData>(loadProgress);
+export const useProgress = (storageKey = 'ofek-progress') => {
+  const [progress, setProgress] = useState<ProgressData>(() => loadProgress(storageKey));
+
+  // Reload progress when storageKey changes (book switch)
+  useEffect(() => {
+    setProgress(loadProgress(storageKey));
+  }, [storageKey]);
 
   useEffect(() => {
-    saveProgress(progress);
-  }, [progress]);
+    saveProgress(storageKey, progress);
+  }, [storageKey, progress]);
 
   const markVisited = useCallback((conceptId: string) => {
     setProgress((prev) => {

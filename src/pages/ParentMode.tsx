@@ -4,7 +4,7 @@ import { concepts } from '../data/concepts';
 import { useProgress } from '../hooks/useProgress';
 
 const ParentMode = () => {
-  const { isVisited, visitedCount } = useProgress();
+  const { isVisited, visitedCount } = useProgress('ofek-progress');
   const visited = concepts.filter((c) => isVisited(c.id));
   const total = concepts.length;
 

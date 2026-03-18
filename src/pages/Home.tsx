@@ -1,15 +1,33 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { concepts } from '../data/concepts';
+import { useBook } from '../context/BookContext';
 import { useProgress } from '../hooks/useProgress';
 import ProgressBar from '../components/ProgressBar';
 
 const Home = () => {
-  const { visitedCount, favoriteCount, isVisited } = useProgress();
+  const { concepts, progressKey, isNewton } = useBook();
+  const { visitedCount, favoriteCount, isVisited } = useProgress(progressKey);
   const totalConcepts = concepts.length;
   const progressPct = (visitedCount / totalConcepts) * 100;
 
   const recentConcepts = concepts.slice(0, 4);
+
+  const bookEmoji = isNewton ? '⚖️' : '🌌';
+  const bookTitle = isNewton ? "Newton's Principia" : 'היסטוריה קצרה של הזמן';
+  const bookSubtitle = isNewton ? 'For Michael' : 'עם אופק';
+  const journeyLabel = isNewton ? 'Guided Journey' : 'מסע מודרך';
+  const journeyDesc = isNewton ? 'Book I to Book III' : 'מפרק 1 עד 13';
+  const exploreLabel = isNewton ? 'Free Exploration' : 'חקירה חופשית';
+  const exploreDesc = isNewton ? 'Choose your concept' : 'בחר את העולם שלך';
+  const progressLabel = isNewton ? 'Your Journey' : 'המסע שלך';
+  const progressDesc = isNewton
+    ? `${visitedCount} of ${totalConcepts} concepts explored`
+    : `${visitedCount} מתוך ${totalConcepts} עולמות נחקרו`;
+  const conceptsLabel = isNewton ? 'Concepts to Explore' : 'עולמות לחקור';
+  const quoteText = isNewton
+    ? '"Plato is my friend, Aristotle is my friend, but my greatest friend is truth."'
+    : '"זכור להסתכל על הכוכבים ולא למטה לרגליך. נסה להבין את מה שאתה רואה."';
+  const quoteAuthor = isNewton ? '— Isaac Newton' : '— סטיבן הוקינג';
 
   return (
     <div className="min-h-screen px-4 pt-8 pb-4 max-w-lg mx-auto">
@@ -20,11 +38,16 @@ const Home = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="text-5xl mb-3 animate-float">🌌</div>
+        <div className="text-5xl mb-3 animate-float">{bookEmoji}</div>
         <h1 className="text-3xl font-black text-white mb-1 leading-tight">
-          היסטוריה קצרה של הזמן
+          {bookTitle}
         </h1>
-        <p className="text-blue-300/60 text-sm">עם אופק</p>
+        <p
+          className="text-sm"
+          style={{ color: isNewton ? '#f59e0b80' : '#93c5fd99' }}
+        >
+          {bookSubtitle}
+        </p>
       </motion.div>
 
       {/* Progress card */}
@@ -37,21 +60,22 @@ const Home = () => {
       >
         <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-white font-bold text-lg">המסע שלך</div>
-            <div className="text-blue-300/60 text-xs">
-              {visitedCount} מתוך {totalConcepts} עולמות נחקרו
-            </div>
+            <div className="text-white font-bold text-lg">{progressLabel}</div>
+            <div className="text-blue-300/60 text-xs">{progressDesc}</div>
           </div>
-          <div className="text-3xl font-black text-blue-400">
+          <div
+            className="text-3xl font-black"
+            style={{ color: isNewton ? '#f59e0b' : '#60a5fa' }}
+          >
             {Math.round(progressPct)}%
           </div>
         </div>
-        <ProgressBar value={progressPct} color="#60a5fa" />
+        <ProgressBar value={progressPct} color={isNewton ? '#f59e0b' : '#60a5fa'} />
 
         <div className="flex gap-4 mt-3 text-xs text-blue-300/50">
-          <span>⭐ {favoriteCount} מועדפים</span>
-          <span>🔭 {visitedCount} שנחקרו</span>
-          <span>📖 {totalConcepts - visitedCount} נותרו</span>
+          <span>⭐ {favoriteCount} {isNewton ? 'saved' : 'מועדפים'}</span>
+          <span>🔭 {visitedCount} {isNewton ? 'read' : 'שנחקרו'}</span>
+          <span>📖 {totalConcepts - visitedCount} {isNewton ? 'remaining' : 'נותרו'}</span>
         </div>
       </motion.div>
 
@@ -63,19 +87,23 @@ const Home = () => {
         transition={{ delay: 0.3 }}
       >
         <Link to="/journey">
-          <div className="rounded-2xl p-4 border border-blue-700/40 hover:border-blue-600/60 transition-all"
-            style={{ background: 'linear-gradient(135deg, #1e3a5f, #1a2040)' }}>
-            <div className="text-2xl mb-2">🚀</div>
-            <div className="font-bold text-sm text-blue-300">מסע מודרך</div>
-            <div className="text-xs text-blue-400/50 mt-0.5">מפרק 1 עד 13</div>
+          <div
+            className="rounded-2xl p-4 border border-blue-700/40 hover:border-blue-600/60 transition-all"
+            style={{ background: 'linear-gradient(135deg, #1e3a5f, #1a2040)' }}
+          >
+            <div className="text-2xl mb-2">{isNewton ? '📜' : '🚀'}</div>
+            <div className="font-bold text-sm text-blue-300">{journeyLabel}</div>
+            <div className="text-xs text-blue-400/50 mt-0.5">{journeyDesc}</div>
           </div>
         </Link>
         <Link to="/explore">
-          <div className="rounded-2xl p-4 border border-purple-700/40 hover:border-purple-600/60 transition-all"
-            style={{ background: 'linear-gradient(135deg, #2d1b4e, #1a2040)' }}>
+          <div
+            className="rounded-2xl p-4 border border-purple-700/40 hover:border-purple-600/60 transition-all"
+            style={{ background: 'linear-gradient(135deg, #2d1b4e, #1a2040)' }}
+          >
             <div className="text-2xl mb-2">🗺️</div>
-            <div className="font-bold text-sm text-purple-300">חקירה חופשית</div>
-            <div className="text-xs text-purple-400/50 mt-0.5">בחר את העולם שלך</div>
+            <div className="font-bold text-sm text-purple-300">{exploreLabel}</div>
+            <div className="text-xs text-purple-400/50 mt-0.5">{exploreDesc}</div>
           </div>
         </Link>
       </motion.div>
@@ -87,9 +115,9 @@ const Home = () => {
         transition={{ delay: 0.4 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-white font-bold text-base">עולמות לחקור</h2>
+          <h2 className="text-white font-bold text-base">{conceptsLabel}</h2>
           <Link to="/explore" className="text-xs text-blue-400 hover:text-blue-300">
-            כולם →
+            {isNewton ? 'All →' : 'כולם →'}
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -112,9 +140,13 @@ const Home = () => {
                   <div className="text-xs font-bold" style={{ color: concept.color }}>
                     {concept.titleHe}
                   </div>
-                  <div className="text-xs text-blue-300/40 mt-0.5">פרק {concept.chapterNumber}</div>
+                  <div className="text-xs text-blue-300/40 mt-0.5">
+                    {isNewton ? concept.chapterLabel.split('—')[0].trim() : `פרק ${concept.chapterNumber}`}
+                  </div>
                   {isVisited(concept.id) && (
-                    <div className="text-xs text-green-400 mt-1">✓ נחקר</div>
+                    <div className="text-xs text-green-400 mt-1">
+                      {isNewton ? '✓ read' : '✓ נחקר'}
+                    </div>
                   )}
                 </div>
               </Link>
@@ -123,7 +155,7 @@ const Home = () => {
         </div>
       </motion.div>
 
-      {/* Hawking quote */}
+      {/* Quote */}
       <motion.div
         className="mt-5 p-4 rounded-2xl border border-white/10"
         style={{ background: 'rgba(255,255,255,0.03)' }}
@@ -132,9 +164,9 @@ const Home = () => {
         transition={{ delay: 0.7 }}
       >
         <p className="text-xs text-blue-300/50 italic leading-relaxed text-center">
-          "זכור להסתכל על הכוכבים ולא למטה לרגליך. נסה להבין את מה שאתה רואה."
+          {quoteText}
         </p>
-        <p className="text-xs text-blue-300/30 text-center mt-1">– סטיבן הוקינג</p>
+        <p className="text-xs text-blue-300/30 text-center mt-1">{quoteAuthor}</p>
       </motion.div>
     </div>
   );
