@@ -61,6 +61,18 @@ const ArrowOfTime = lazy(() => import('../concepts/ArrowOfTime'));
 const Wormholes = lazy(() => import('../concepts/Wormholes'));
 const Unification = lazy(() => import('../concepts/Unification'));
 
+// Lazy load interactive concept visuals (Newton's Principia)
+const LawsOfMotion = lazy(() => import('../concepts/newton/LawsOfMotion'));
+const AbsoluteSpaceTime = lazy(() => import('../concepts/newton/AbsoluteSpaceTime'));
+const MethodOfRatios = lazy(() => import('../concepts/newton/MethodOfRatios'));
+const CentripetalForce = lazy(() => import('../concepts/newton/CentripetalForce'));
+const UniversalGravitation = lazy(() => import('../concepts/newton/UniversalGravitation'));
+const MoonTest = lazy(() => import('../concepts/newton/MoonTest'));
+const FluidResistance = lazy(() => import('../concepts/newton/FluidResistance'));
+const SpeedOfSound = lazy(() => import('../concepts/newton/SpeedOfSound'));
+const FigureOfEarth = lazy(() => import('../concepts/newton/FigureOfEarth'));
+const CometaryOrbits = lazy(() => import('../concepts/newton/CometaryOrbits'));
+
 const conceptVisuals: Record<string, React.ComponentType> = {
   'scale-universe': ScaleUniverse,
   'space-time': SpaceTime,
@@ -75,6 +87,17 @@ const conceptVisuals: Record<string, React.ComponentType> = {
   'arrow-of-time': ArrowOfTime,
   'wormholes': Wormholes,
   'unification': Unification,
+  // Newton's Principia
+  'laws-of-motion': LawsOfMotion,
+  'absolute-space-time': AbsoluteSpaceTime,
+  'method-of-ratios': MethodOfRatios,
+  'centripetal-force': CentripetalForce,
+  'universal-gravitation': UniversalGravitation,
+  'moon-test': MoonTest,
+  'fluid-resistance': FluidResistance,
+  'speed-of-sound': SpeedOfSound,
+  'figure-of-earth': FigureOfEarth,
+  'cometary-orbits': CometaryOrbits,
 };
 
 type TabId = 'explanation' | 'interactive' | 'deeper' | 'parent';
